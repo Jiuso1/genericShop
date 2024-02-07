@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author jesus
  */
-@WebServlet(name = "Controller", urlPatterns = {"/do/*"})
+@WebServlet(name = "ControllerServlet", urlPatterns = {"/do/*"})
 public class ControllerServlet extends HttpServlet {
 
     public void init() {
@@ -37,6 +37,9 @@ public class ControllerServlet extends HttpServlet {
 
         switch (action) {
             case "/register": {
+                String name = request.getParameter("name");
+                String password = request.getParameter("password");
+                System.out.println("name is "+name+" and password is "+password);
                 view = "../WEB-INF/registered.jsp";//view = "../WEB-INF/jsp/signIn.jsp";
                 break;
             }
