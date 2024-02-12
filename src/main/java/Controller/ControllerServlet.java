@@ -6,6 +6,13 @@ package Controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,8 +27,18 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name = "ControllerServlet", urlPatterns = {"/do/*"})
 public class ControllerServlet extends HttpServlet {
 
+    private Connection conn;
+    
     public void init() {
-        
+        try {
+            System.out.println("xdddd");
+            Class.forName("org.sqlite.JDBC");
+            conn = DriverManager.getConnection("jdbc:sqlite:C:/Users/manu_/Desktop/Clase/4-Cuarto/DAW/genericShop/database/database.db");
+        } catch (SQLException ex) {
+            Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void destroy(){
@@ -37,10 +54,60 @@ public class ControllerServlet extends HttpServlet {
 
         switch (action) {
             case "/register": {
-                String name = request.getParameter("name");
+                String email = request.getParameter("email");
                 String password = request.getParameter("password");
-                System.out.println("name is "+name+" and password is "+password);
+                System.out.println("email is "+email+" and password is "+password);
+                
+                PreparedStatement ps;
+                
+            try {
+                //We insert in USER table:
+                ps = conn.prepareStatement("INSERT INTO USER VALUES(?,?,NULL)");
+                ps.setString(1, email);
+                ps.setString(2, password);
+                ps.executeUpdate();
+                ps.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+                
                 view = "../WEB-INF/registered.jsp";//view = "../WEB-INF/jsp/signIn.jsp";
+                break;
+            }
+            case "/login": {
+                String email = request.getParameter("email");
+                String password = request.getParameter("password");
+                
+                PreparedStatement ps;
+                
+                try {
+                //We insert in USER table:
+                ps = conn.prepareStatement("SELECT password, id FROM USER WHERE EMAIL=?");
+                ps.setString(1, email);
+                ResultSet rs = ps.executeQuery();
+                String psw = null;
+                String id = null;
+                while(rs.next()) {
+                    psw = rs.getString("password");
+                    id = rs.getString("id");
+                }
+                
+                if(password.equals(psw)) {
+                    request.getSession().setAttribute("sessionId", id);
+                }
+                
+                ps.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+                
+                view = "../WEB-INF/loged.jsp";//view = "../WEB-INF/jsp/signIn.jsp";
+                break;
+                
+            }
+            
+            case "/realIndex": {
+                view = "../WEB-INF/index.jsp";
                 break;
             }
         }
