@@ -4,6 +4,7 @@
  */
 package Controller;
 
+import Model.Product;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -11,6 +12,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
@@ -28,13 +30,14 @@ import javax.servlet.http.HttpServletResponse;
 public class ControllerServlet extends HttpServlet {
 
     private Connection conn;
+    private PreparedStatement ps;
 
     public void init() {
         String jesusPath = "jdbc:sqlite:C:/Users/jesus/documents/desarrolloWeb/daw/genericShop/database/database.db";
         String manuPath = "jdbc:sqlite:C:/Users/manu_/Desktop/Clase/4-Cuarto/DAW/genericShop/database/database.db";
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection(manuPath);
+            conn = DriverManager.getConnection(jesusPath);
         } catch (SQLException | ClassNotFoundException ex) {
             Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -61,8 +64,6 @@ public class ControllerServlet extends HttpServlet {
                 String password = request.getParameter("password");
                 System.out.println("email is " + email + " and password is " + password);
 
-                PreparedStatement ps;
-
                 try {
                     ps = conn.prepareStatement("SELECT * FROM USER WHERE EMAIL=?");
                     ps.setString(1, email);
@@ -87,8 +88,6 @@ public class ControllerServlet extends HttpServlet {
             case "/login": {
                 String email = request.getParameter("email");
                 String password = request.getParameter("password");
-
-                PreparedStatement ps;
 
                 try {
                     //We insert in USER table:
@@ -116,12 +115,48 @@ public class ControllerServlet extends HttpServlet {
             }
 
             case "/realIndex": {
+                try {
+                    ArrayList<Product> productArray = new ArrayList<>();
+                    ps = conn.prepareStatement("SELECT * FROM PRODUCT");
+                    ResultSet rs = ps.executeQuery();
+                    while (rs.next()) {
+                        int id = rs.getInt("id");
+                        String name = rs.getString("name");
+                        String description = rs.getString("description");
+                        float price = rs.getFloat("price");
+                        String imagePath = rs.getString("imagePath");
+                        Product product = new Product(id, name, description, price, imagePath);
+                        productArray.add(product);
+                    }
+                    ps.close();
+                    request.setAttribute("productArray", productArray);
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
                 view = "../WEB-INF/index.jsp";
                 break;
             }
 
             case "/logout": {
                 request.getSession().setAttribute("sessionId", null);
+                try {
+                    ArrayList<Product> productArray = new ArrayList<>();
+                    ps = conn.prepareStatement("SELECT * FROM PRODUCT");
+                    ResultSet rs = ps.executeQuery();
+                    while (rs.next()) {
+                        int id = rs.getInt("id");
+                        String name = rs.getString("name");
+                        String description = rs.getString("description");
+                        float price = rs.getFloat("price");
+                        String imagePath = rs.getString("imagePath");
+                        Product product = new Product(id, name, description, price, imagePath);
+                        productArray.add(product);
+                    }
+                    ps.close();
+                    request.setAttribute("productArray", productArray);
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
                 view = "../WEB-INF/index.jsp";
                 break;
             }
