@@ -24,10 +24,16 @@
             ArrayList<Product> productArray = (ArrayList<Product>)request.getAttribute("productArray");
             for(int i = 0;i < productArray.size();i++){
                 Product product = productArray.get(i);
-                out.println("<h3>"+product.getName()+"</h3>");
-                out.println("<p>"+product.getDescription()+"</p>");
-                out.println("<p>"+product.getPrice()+"</p>");
-                out.println("<img src=\""+product.getImagePath()+"\">");
+                out.println("<div style=\"height: 200px; width: 150px; border:1px solid black; margin-bottom:100px\">"
+                + "<h3>"+product.getName()+"</h3>"
+                + "<p>"+product.getDescription()+"</p>"
+                + "<p>"+product.getPrice()+"</p>"
+                + "<img src=\""+product.getImagePath()+"\">"
+                + "<p></p>"
+                + "<button class=\"addCart\" value=\""+product.getId()+"\">Agregar al carrito</button>"
+                + "</div>"
+                + "<script src=\"../cart.js\" type=\"text/javascript\"></script>"
+                );
             }
         %>
     </body>
