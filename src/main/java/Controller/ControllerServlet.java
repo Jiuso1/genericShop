@@ -90,21 +90,18 @@ public class ControllerServlet extends HttpServlet {
                         psw = rs.getString("password");
                         id = rs.getString("id");
                     }
+                    ps.close();
 
                     if (password.equals(psw)) {
                         request.getSession().setAttribute("sessionId", id);
-                    }else{
-                        
+                        view = "../WEB-INF/loged.jsp";
+                    } else {
+                        view = "../WEB-INF/signIn.jsp";
                     }
-
-                    ps.close();
                 } catch (SQLException ex) {
                     Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
-                view = "../WEB-INF/loged.jsp";
                 break;
-
             }
 
             case "/realIndex": {
@@ -113,9 +110,18 @@ public class ControllerServlet extends HttpServlet {
             }
 
             case "/logout": {
-                System.out.println("asdjsdjjasdjadsj xd");
                 request.getSession().setAttribute("sessionId", null);
                 view = "../WEB-INF/index.jsp";
+                break;
+            }
+
+            case "/signIn": {
+                view = "../WEB-INF/signIn.jsp";
+                break;
+            }
+            
+            case "/viewRegister":{
+                view = "../WEB-INF/register.jsp";
                 break;
             }
 

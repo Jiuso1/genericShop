@@ -1,3 +1,4 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <!--
 Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -10,8 +11,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/html.html to edit this
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-        <h1>Log in</h1>
-        <form action="do/login"> 
+        <h1>register</h1>
+        <form action="register"> 
             <label for="email">email</label> 
             <input type="email" id="email" 
                    name="email" 
@@ -24,7 +25,5 @@ Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/html.html to edit this
             
             <button type="submit">Submit</button>  
         </form> 
-        <h1>Dont have account? Register here!</h1>
-        <p><a href="./register.html">register</a></p>
     </body>
 </html>

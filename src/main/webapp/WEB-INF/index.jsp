@@ -15,7 +15,7 @@
         <h1>Index</h1>
         <%
             if (session.getAttribute("sessionId") == null) {
-                out.println("<p><a href=\"../signIn.html\">sign in</a></p>");
+                out.println("<form action=\"signIn\"><button type=\"submit\">login</button></form>");
             } else {
                 out.println("<form action=\"logout\"><button type=\"submit\">log out</button></form>");
             }
