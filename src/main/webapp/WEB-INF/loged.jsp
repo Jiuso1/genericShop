@@ -14,5 +14,6 @@
     <body>
         <h1>You are now logged in and your id is: <%out.println(session.getAttribute("sessionId"));%></h1>
         <p><a href="../index.html">Back to home</a></p>
+        <form action="removeAccount"><button type="submit">Remove account</button></form>
     </body>
 </html>

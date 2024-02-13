@@ -34,14 +34,18 @@ public class ControllerServlet extends HttpServlet {
         String manuPath = "jdbc:sqlite:C:/Users/manu_/Desktop/Clase/4-Cuarto/DAW/genericShop/database/database.db";
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection(jesusPath);
+            conn = DriverManager.getConnection(manuPath);
         } catch (SQLException | ClassNotFoundException ex) {
             Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public void destroy() {
-
+        try {
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -60,17 +64,24 @@ public class ControllerServlet extends HttpServlet {
                 PreparedStatement ps;
 
                 try {
-                    //We insert in USER table:
-                    ps = conn.prepareStatement("INSERT INTO USER VALUES(?,?,NULL)");
+                    ps = conn.prepareStatement("SELECT * FROM USER WHERE EMAIL=?");
                     ps.setString(1, email);
-                    ps.setString(2, password);
-                    ps.executeUpdate();
-                    ps.close();
+                    ResultSet consulta = ps.executeQuery();
+                    if (consulta.next()) {
+                        view = "../WEB-INF/register.jsp";
+                    } else {
+                        ps = conn.prepareStatement("INSERT INTO USER VALUES(?,?,NULL)");
+                        ps.setString(1, email);
+                        ps.setString(2, password);
+                        ps.executeUpdate();
+                        ps.close();
+                        view = "../WEB-INF/registered.jsp";//view = "../WEB-INF/jsp/signIn.jsp";
+                    }
+
                 } catch (SQLException ex) {
                     Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                view = "../WEB-INF/registered.jsp";//view = "../WEB-INF/jsp/signIn.jsp";
                 break;
             }
             case "/login": {
@@ -119,10 +130,33 @@ public class ControllerServlet extends HttpServlet {
                 view = "../WEB-INF/signIn.jsp";
                 break;
             }
-            
-            case "/viewRegister":{
+
+            case "/viewRegister": {
                 view = "../WEB-INF/register.jsp";
                 break;
+            }
+
+            case "/removeAccount": {
+
+                if (request.getSession().getAttribute("sessionId") == null) {
+                    view = "../WEB-INF/error.jsp";
+                } else {
+                    try {
+                        PreparedStatement ps;
+                        ps = conn.prepareStatement("DELETE FROM USER WHERE ID=?");
+                        ps.setString(1, (String) request.getSession().getAttribute("sessionId"));
+                        ps.executeUpdate();
+                        ps.close();
+
+                        request.getSession().setAttribute("sessionId", null);
+                        view = "../WEB-INF/accountRemoved.jsp";
+
+                        break;
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
             }
 
         }
