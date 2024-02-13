@@ -14,10 +14,10 @@
     <body>
         <h1>Index</h1>
         <%
-            if (session.getAttribute("id") == null) {
-                out.println("<p><a href=\"./signIn.html\">sign in</a></p>");
+            if (session.getAttribute("sessionId") == null) {
+                out.println("<p><a href=\"../signIn.html\">sign in</a></p>");
             } else {
-                out.println("<p><a href=\"./signIn.html\">log out</a></p>");
+                out.println("<form action=\"logout\"><button type=\"submit\">log out</button></form>");
             }
         %>
     </body>
