@@ -172,7 +172,6 @@ public class ControllerServlet extends HttpServlet {
             }
 
             case "/removeAccount": {
-
                 if (request.getSession().getAttribute("sessionId") == null) {
                     view = "../WEB-INF/error.jsp";
                 } else {
@@ -191,7 +190,19 @@ public class ControllerServlet extends HttpServlet {
                         Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
+            }
 
+            case "/sendCart": {
+                // Get JS Data:
+                String jsonData = request.getReader().lines().collect(java.util.stream.Collectors.joining());
+                System.out.println("JS received: " + jsonData);
+                view = "../WEB-INF/cart.jsp";
+                break;
+            }
+            
+            case "/viewCart":{
+                view = "../WEB-INF/cart.jsp";
+                break;
             }
 
         }

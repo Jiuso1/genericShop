@@ -15,7 +15,7 @@
     </head>
     <body>
         <h1>Index</h1>
-        <h2><span id="cartCounter">0</span></h2>
+        <button id="cartCounter" type="submit">0</button>
         <%
             if (session.getAttribute("sessionId") == null) {
                 out.println("<form action=\"signIn\"><button type=\"submit\">login</button></form>");
@@ -40,5 +40,6 @@
             }
             out.println("<script src=\"../cart.js\" type=\"text/javascript\"></script>");
         %>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     </body>
 </html>
