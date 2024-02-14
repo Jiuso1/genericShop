@@ -91,19 +91,23 @@ public class ControllerServlet extends HttpServlet {
 
                 try {
                     //We insert in USER table:
-                    ps = conn.prepareStatement("SELECT password, id FROM USER WHERE EMAIL=?");
+                    ps = conn.prepareStatement("SELECT password, id, admin FROM USER WHERE EMAIL=?");
                     ps.setString(1, email);
                     ResultSet rs = ps.executeQuery();
                     String psw = null;
                     String id = null;
+                    String admin = null;
                     while (rs.next()) {
                         psw = rs.getString("password");
                         id = rs.getString("id");
+                        admin = rs.getString("admin");
                     }
                     ps.close();
 
                     if (password.equals(psw)) {
+                        
                         request.getSession().setAttribute("sessionId", id);
+                        request.getSession().setAttribute("admin", admin);
                         view = "../WEB-INF/loged.jsp";
                     } else {
                         view = "../WEB-INF/signIn.jsp";
@@ -140,6 +144,7 @@ public class ControllerServlet extends HttpServlet {
 
             case "/logout": {
                 request.getSession().setAttribute("sessionId", null);
+                request.getSession().setAttribute("admin", null);
                 try {
                     ArrayList<Product> productArray = new ArrayList<>();
                     ps = conn.prepareStatement("SELECT * FROM PRODUCT");
@@ -185,6 +190,7 @@ public class ControllerServlet extends HttpServlet {
                         ps.close();
 
                         request.getSession().setAttribute("sessionId", null);
+                        request.getSession().setAttribute("admin", null);
                         view = "../WEB-INF/accountRemoved.jsp";
 
                         break;
@@ -289,7 +295,8 @@ public class ControllerServlet extends HttpServlet {
 
                             ps = conn.prepareStatement("UPDATE PRODUCT SET SOLD=1 WHERE ID=?");
                             ps.setString(1, Integer.toString(cartItems.get(i).getId()));
-
+                            ps.executeUpdate();
+                            
                             ps.close();
                         }
                         request.setAttribute("orderId", orderId);
@@ -304,6 +311,36 @@ public class ControllerServlet extends HttpServlet {
 
                 break;
             }
+            
+            case "/purchases": {
+                
+            try {
+                PreparedStatement ps = conn.prepareStatement("SELECT * FROM PURCHASE pu JOIN PRODUCT_ORDER op ON pu.id=op.purchase JOIN PRODUCT pr ON op.product=pr.id WHERE USER=?");
+                ps.setString(1, (String) request.getSession().getAttribute("sessionId"));
+                
+                ResultSet rs = ps.executeQuery();
+                
+                ArrayList<Product> purchasesArray = new ArrayList<>();
+                while(rs.next()) {
+                    purchasesArray.add(new Product(rs.getInt("id"),rs.getString("name"),rs.getString("description"),rs.getFloat("price"),rs.getString("imagePath"),rs.getInt("sold")));
+                }
+                
+                request.setAttribute("purchasesArray", purchasesArray);
+                System.out.println("Cuantas compras: " + request.getSession().getAttribute("sessionId") + " xd " + purchasesArray.size());
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+                
+                view = "../WEB-INF/purchases.jsp";
+                break;
+            }
+            
+            case "/addProduct": {
+            
+                view = "../WEB-INF/addProduct.jsp";
+                break;
+            }
         }
 
         if (view != null) {
@@ -312,7 +349,7 @@ public class ControllerServlet extends HttpServlet {
                 rd.forward(request, response);
             }
         } else {
-            System.out.println("Error: action values " + action + ", view values " + view);
+            System.out.println("Action values " + action + ", view values " + view);
         }
 
     }

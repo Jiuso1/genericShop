@@ -21,7 +21,12 @@
                 out.println("<form action=\"signIn\"><button type=\"submit\">login</button></form>");
             } else {
                 out.println("<form action=\"logout\"><button type=\"submit\">log out</button></form>");
+                out.println("<form action=\"purchases\"><button type=\"submit\">View made purchases</button></form>");
+                if (request.getSession().getAttribute("admin").equals("1")) {
+                    out.println("<form action=\"addProduct\"><button style=\"background-color: DarkCyan;\" type=\"submit\">Upload a product</button></form>");
+                }
             }
+
             ArrayList<Product> productArray = (ArrayList<Product>) request.getAttribute("productArray");
             if (productArray != null) {
                 for (int i = 0; i < productArray.size(); i++) {
@@ -38,6 +43,9 @@
                         }
                         out.println("<p></p>");
                         out.println("<button class=\"addCart\" value=\"" + product.getId() + "\">Agregar al carrito</button>");
+                        if (request.getSession().getAttribute("admin").equals("1")) {
+                            out.println("<form action=\"removeProduct\"><button style=\"background-color: red;\" type=\"submit\">Remove product</button></form>");
+                        }
                         out.println("</div>");
                     }
                 }
