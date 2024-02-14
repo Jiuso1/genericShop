@@ -23,20 +23,22 @@
                 out.println("<form action=\"logout\"><button type=\"submit\">log out</button></form>");
             }
             ArrayList<Product> productArray = (ArrayList<Product>) request.getAttribute("productArray");
-            for (int i = 0; i < productArray.size(); i++) {
-                Product product = productArray.get(i);
-                out.println("<div style=\"height: 200px; width: 150px; border:1px solid black; margin-bottom:100px\">");
-                out.println("<h3>" + product.getName() + "</h3>");
-                out.println("<p>" + product.getDescription() + "</p>");
-                out.println("<p>" + product.getPrice() + " €</p>");
-                if (product.getImagePath() == null || !product.getImagePath().contains("localhost")) {
-                    out.println("<img src=\"http://localhost:8080/genericShop/images/error.jpg\">");
-                } else {
-                    out.println("<img src=\"" + product.getImagePath() + "\">");
+            if (productArray != null) {
+                for (int i = 0; i < productArray.size(); i++) {
+                    Product product = productArray.get(i);
+                    out.println("<div style=\"height: 200px; width: 150px; border:1px solid black; margin-bottom:100px\">");
+                    out.println("<h3>" + product.getName() + "</h3>");
+                    out.println("<p>" + product.getDescription() + "</p>");
+                    out.println("<p>" + product.getPrice() + " €</p>");
+                    if (product.getImagePath() == null || !product.getImagePath().contains("localhost")) {
+                        out.println("<img src=\"http://localhost:8080/genericShop/images/error.jpg\">");
+                    } else {
+                        out.println("<img src=\"" + product.getImagePath() + "\">");
+                    }
+                    out.println("<p></p>");
+                    out.println("<button class=\"addCart\" value=\"" + product.getId() + "\">Agregar al carrito</button>");
+                    out.println("</div>");
                 }
-                out.println("<p></p>");
-                out.println("<button class=\"addCart\" value=\"" + product.getId() + "\">Agregar al carrito</button>");
-                out.println("</div>");
             }
             out.println("<script src=\"../cart.js\" type=\"text/javascript\"></script>");
         %>

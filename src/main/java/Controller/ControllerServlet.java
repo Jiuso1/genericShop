@@ -7,7 +7,6 @@ package Controller;
 import Model.Product;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -16,10 +15,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -130,7 +125,8 @@ public class ControllerServlet extends HttpServlet {
                         String description = rs.getString("description");
                         float price = rs.getFloat("price");
                         String imagePath = rs.getString("imagePath");
-                        Product product = new Product(id, name, description, price, imagePath);
+                        int sold = rs.getInt("sold");
+                        Product product = new Product(id, name, description, price, imagePath, sold);
                         productArray.add(product);
                     }
                     ps.close();
@@ -154,7 +150,8 @@ public class ControllerServlet extends HttpServlet {
                         String description = rs.getString("description");
                         float price = rs.getFloat("price");
                         String imagePath = rs.getString("imagePath");
-                        Product product = new Product(id, name, description, price, imagePath);
+                        int sold = rs.getInt("sold");
+                        Product product = new Product(id, name, description, price, imagePath, sold);
                         productArray.add(product);
                     }
                     ps.close();
@@ -213,7 +210,8 @@ public class ControllerServlet extends HttpServlet {
                             String description = rs.getString("description");
                             float price = rs.getFloat("price");
                             String imagePath = rs.getString("imagePath");
-                            Product product = new Product(id, name, description, price, imagePath);
+                            int sold = rs.getInt("sold");
+                            Product product = new Product(id, name, description, price, imagePath, sold);
                             cartItems.add(product);
                         }
                         ps.close();
@@ -230,7 +228,35 @@ public class ControllerServlet extends HttpServlet {
                 view = "../WEB-INF/cart.jsp";
                 break;
             }
+            case "/removeCart": {
+                try {
+                    ArrayList<Product> productArray = new ArrayList<>();
+                    ps = conn.prepareStatement("SELECT * FROM PRODUCT");
+                    ResultSet rs = ps.executeQuery();
+                    while (rs.next()) {
+                        int id = rs.getInt("id");
+                        String name = rs.getString("name");
+                        String description = rs.getString("description");
+                        float price = rs.getFloat("price");
+                        String imagePath = rs.getString("imagePath");
+                        int sold = rs.getInt("sold");
+                        Product product = new Product(id, name, description, price, imagePath, sold);
+                        productArray.add(product);
+                    }
+                    ps.close();
+                    request.setAttribute("productArray", productArray);
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+                view = "../WEB-INF/index.jsp";
+                break;
+            }
+            case "/processCart": {
+                view = "../WEB-INF/process.jsp";
+                break;
+            }
         }
+
         if (view != null) {
             RequestDispatcher rd = request.getRequestDispatcher(view);
             if (rd != null) {
@@ -239,6 +265,7 @@ public class ControllerServlet extends HttpServlet {
         } else {
             System.out.println("Error: action values " + action + ", view values " + view);
         }
+
     }
 
     @Override

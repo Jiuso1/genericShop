@@ -14,30 +14,34 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <h1>Cart</h1>
         <%
-            
-            System.out.println("BIEN");
+            float totalPrice = 0;
             ArrayList<Product> productArray = (ArrayList<Product>) session.getAttribute("cartItems");
-            System.out.println("MUY BIEN");
-            if(productArray == null) {
-                System.out.println("ES NULOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-            } else {
+            if (productArray != null) {
                 for (int i = 0; i < productArray.size(); i++) {
-                Product product = new Product(productArray.get(i).getId(),productArray.get(i).getName(),productArray.get(i).getDescription(),productArray.get(i).getPrice(),productArray.get(i).getImagePath());
-                out.println("<div style=\"height: 200px; width: 150px; border:1px solid black; margin-bottom:100px\">");
-                out.println("<h3>" + product.getName() + "</h3>");
-                out.println("<p>" + product.getDescription() + "</p>");
-                out.println("<p>" + product.getPrice() + " €</p>");
-                if (product.getImagePath() == null || !product.getImagePath().contains("localhost")) {
-                    out.println("<img src=\"http://localhost:8080/genericShop/images/error.jpg\">");
-                } else {
-                    out.println("<img src=\"" + product.getImagePath() + "\">");
+                    Product product = new Product(productArray.get(i).getId(), productArray.get(i).getName(), productArray.get(i).getDescription(), productArray.get(i).getPrice(), productArray.get(i).getImagePath());
+                    out.println("<div style=\"height: 200px; width: 150px; border:1px solid black; margin-bottom:100px\">");
+                    out.println("<h3>" + product.getName() + "</h3>");
+                    out.println("<p>" + product.getDescription() + "</p>");
+                    out.println("<p>" + product.getPrice() + " €</p>");
+                    if (product.getImagePath() == null || !product.getImagePath().contains("localhost")) {
+                        out.println("<img src=\"http://localhost:8080/genericShop/images/error.jpg\">");
+                    } else {
+                        out.println("<img src=\"" + product.getImagePath() + "\">");
+                    }
+                    out.println("</div>");
+                    totalPrice += product.getPrice();
                 }
-                out.println("</div>");
+                out.println("<h2>"+totalPrice+" €</h2>");
             }
-            }
-            
         %>
+        <form action="removeCart">
+            <button type="submit">Remove cart and go back</button>
+        </form>
+        <form action="processCart">
+            
+            <button type="submit">Process your order</button>
+        </form>
     </body>
 </html>
