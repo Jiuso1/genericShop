@@ -19,23 +19,20 @@ function updateCartCounter() {
 
 cartCounter.onclick = function () {
     sendCartToJava(cart);
-    //Let's go to the web!
-    window.location.href = "http://localhost:8080/genericShop/do/viewCart";
 }
 
 function sendCartToJava(cart) {
-    // Enviar la estructura de datos al servidor (Java) con AJAX utilizando jQuery
+    // Utilizando jQuery AJAX para enviar datos
     $.ajax({
         type: "POST",
         url: "http://localhost:8080/genericShop/do/sendCart",
-        contentType: "application/json",
-        data: JSON.stringify({ cart: cart }),
-        success: function(response) {
+        data: {cart: cart},
+        success: function (response) {
             console.log("Success sending data!");
-            // Puedes manejar la respuesta del servidor si es necesario
+            window.location.href = "http://localhost:8080/genericShop/do/viewCart";
         },
-        error: function(error) {
-            console.error("Failed sending data :(");
+        error: function (error) {
+            console.error("Failed sending data :(", error);
         }
     });
 }

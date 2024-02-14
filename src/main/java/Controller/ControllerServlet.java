@@ -42,7 +42,7 @@ public class ControllerServlet extends HttpServlet {
         String manuPath = "jdbc:sqlite:C:/Users/manu_/Desktop/Clase/4-Cuarto/DAW/genericShop/database/database.db";
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection(manuPath);
+            conn = DriverManager.getConnection(jesusPath);
         } catch (SQLException | ClassNotFoundException ex) {
             Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -198,64 +198,47 @@ public class ControllerServlet extends HttpServlet {
             }
 
             case "/sendCart": {
-                ArrayList<Integer> idsList = new ArrayList<>();
-                // Get JS Data:   
                 String jsonData = request.getReader().lines().collect(java.util.stream.Collectors.joining());
-                System.out.println("JS received: " + jsonData);
-
-                try (JsonReader jsonReader = Json.createReader(new StringReader(jsonData))) {
-                    // Leer el JSON como objeto
-                    JsonObject jsonObject = jsonReader.readObject();
-
-                    // Obtener el array "cart" del objeto
-                    JsonArray cartArray = jsonObject.getJsonArray("cart");
-
-                    // Crear un ArrayList para almacenar los IDs
-                    // Iterar sobre los elementos del array y agregarlos al ArrayList
-                    for (int i = 0; i < cartArray.size(); i++) {
-                        // Convertir el valor del array a entero y agregarlo al ArrayList
-                        idsList.add(Integer.parseInt(cartArray.getString(i)));
-                    }
-                }
-
-                ArrayList<Product> productArray = new ArrayList<>();
-                try {
-                    for (int i = 0; i < idsList.size(); i++) {
+                ArrayList<Integer> idList = parseJson(jsonData);
+                ArrayList<Product> cartItems = new ArrayList<>();
+                for (int i = 0; i < idList.size(); i++) {
+                    int id = idList.get(i);
+                    try {
                         ps = conn.prepareStatement("SELECT * FROM PRODUCT WHERE ID=?");
-                        ps.setString(1, Integer.toString(idsList.get(i)));
+                        ps.setString(1, Integer.toString(id));
                         ResultSet rs = ps.executeQuery();
                         while (rs.next()) {
-                            int id = rs.getInt("id");
+                            int productId = rs.getInt("id");
                             String name = rs.getString("name");
                             String description = rs.getString("description");
                             float price = rs.getFloat("price");
                             String imagePath = rs.getString("imagePath");
                             Product product = new Product(id, name, description, price, imagePath);
-                            productArray.add(product);
+                            cartItems.add(product);
                         }
                         ps.close();
+                    } catch (SQLException ex) {
+                        System.out.println(ex.getMessage());
                     }
-
-                } catch (SQLException ex) {
-                    Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
-                request.setAttribute("cartItems", productArray);
-                view = "../WEB-INF/cart.jsp";
+                request.getSession().setAttribute("cartItems", cartItems);
+                //view = "../WEB-INF/cart.jsp";
                 break;
             }
-            
+
             case "/viewCart": {
                 view = "../WEB-INF/cart.jsp";
                 break;
             }
         }
-
-        RequestDispatcher rd = request.getRequestDispatcher(view);
-        if (rd == null) {
-            System.out.println("Error: rd is null and action values " + action);
+        if (view != null) {
+            RequestDispatcher rd = request.getRequestDispatcher(view);
+            if (rd != null) {
+                rd.forward(request, response);
+            }
+        } else {
+            System.out.println("Error: action values " + action + ", view values " + view);
         }
-        rd.forward(request, response);
     }
 
     @Override
@@ -272,6 +255,17 @@ public class ControllerServlet extends HttpServlet {
             throws ServletException, IOException {
 
         processRequest(request, response);
+    }
+
+    private ArrayList<Integer> parseJson(final String jsonString) {
+        ArrayList<Integer> idList = new ArrayList<>();
+        for (int i = 0; i < jsonString.length(); i++) {
+            if (jsonString.charAt(i) == '=') {
+                int id = Integer.parseInt(String.valueOf(jsonString.charAt(i + 1)));
+                idList.add(id);
+            }
+        }
+        return idList;
     }
 
 }

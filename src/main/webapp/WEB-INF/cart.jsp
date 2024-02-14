@@ -18,7 +18,7 @@
         <%
             
             System.out.println("BIEN");
-            ArrayList<Product> productArray = (ArrayList<Product>) request.getAttribute("cartItems");
+            ArrayList<Product> productArray = (ArrayList<Product>) session.getAttribute("cartItems");
             System.out.println("MUY BIEN");
             if(productArray == null) {
                 System.out.println("ES NULOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
