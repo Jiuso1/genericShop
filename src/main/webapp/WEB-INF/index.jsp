@@ -17,12 +17,14 @@
         <h1>Index</h1>
         <button id="cartCounter" type="submit">0</button>
         <%
+            String admin = (String) request.getSession().getAttribute("admin");
+            
             if (session.getAttribute("sessionId") == null) {
                 out.println("<form action=\"signIn\"><button type=\"submit\">login</button></form>");
             } else {
                 out.println("<form action=\"logout\"><button type=\"submit\">log out</button></form>");
                 out.println("<form action=\"purchases\"><button type=\"submit\">View made purchases</button></form>");
-                if (request.getSession().getAttribute("admin").equals("1")) {
+                if (admin != null && admin.equals("1")) {
                     out.println("<form action=\"addProduct\"><button style=\"background-color: DarkCyan;\" type=\"submit\">Upload a product</button></form>");
                 }
             }
@@ -41,10 +43,10 @@
                         } else {
                             out.println("<img src=\"" + product.getImagePath() + "\">");
                         }
-                        out.println("<p></p>");
-                        out.println("<button class=\"addCart\" value=\"" + product.getId() + "\">Agregar al carrito</button>");
-                        if (request.getSession().getAttribute("admin").equals("1")) {
-                            out.println("<form action=\"removeProduct\"><button style=\"background-color: red;\" type=\"submit\">Remove product</button></form>");
+                        out.println("<br>");
+                        out.println("<button class=\"addCart\" value=\"" + product.getId() + "\">Add to cart</button>");
+                        if (admin != null && admin.equals("1")) {
+                            out.println("<form action=\"removeProduct\"><button style=\"background-color: red;\" type=\"submit\" name=\"" + product.getId() + "\">Remove product</button></form>");
                         }
                         out.println("</div>");
                     }

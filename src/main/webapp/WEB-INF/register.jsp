@@ -25,7 +25,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/html.html to edit this
             
             <label for="password">password</label> 
             <input type="password" id="password" 
-                   name="password" 
+                   name="passwordTwo" 
                    placeholder="Enter your password" required> 
             
             <button type="submit">Submit</button>  

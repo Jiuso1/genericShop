@@ -37,7 +37,7 @@ public class ControllerServlet extends HttpServlet {
         String manuPath = "jdbc:sqlite:C:/Users/manu_/Desktop/Clase/4-Cuarto/DAW/genericShop/database/database.db";
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection(manuPath);
+            conn = DriverManager.getConnection(jesusPath);
         } catch (SQLException | ClassNotFoundException ex) {
             Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -62,25 +62,29 @@ public class ControllerServlet extends HttpServlet {
             case "/register": {
                 String email = request.getParameter("email");
                 String password = request.getParameter("password");
-                System.out.println("email is " + email + " and password is " + password);
+                String passwordTwo = request.getParameter("passwordTwo");
 
-                try {
-                    ps = conn.prepareStatement("SELECT * FROM USER WHERE EMAIL=?");
-                    ps.setString(1, email);
-                    ResultSet consulta = ps.executeQuery();
-                    if (consulta.next()) {
-                        view = "../WEB-INF/register.jsp";
-                    } else {
-                        ps = conn.prepareStatement("INSERT INTO USER VALUES(?,?,NULL)");
+                if (password.equals(passwordTwo)) {
+                    try {
+                        ps = conn.prepareStatement("SELECT * FROM USER WHERE EMAIL=?");
                         ps.setString(1, email);
-                        ps.setString(2, password);
-                        ps.executeUpdate();
-                        ps.close();
-                        view = "../WEB-INF/registered.jsp";//view = "../WEB-INF/jsp/signIn.jsp";
-                    }
+                        ResultSet consulta = ps.executeQuery();
+                        if (consulta.next()) {
+                            view = "../WEB-INF/register.jsp";
+                        } else {
+                            ps = conn.prepareStatement("INSERT INTO USER VALUES(?,?,NULL,0)");
+                            ps.setString(1, email);
+                            ps.setString(2, password);
+                            ps.executeUpdate();
+                            ps.close();
+                            view = "../WEB-INF/registered.jsp";//view = "../WEB-INF/jsp/signIn.jsp";
+                        }
 
-                } catch (SQLException ex) {
-                    Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    view = "../WEB-INF/register.jsp";
                 }
 
                 break;
@@ -105,7 +109,7 @@ public class ControllerServlet extends HttpServlet {
                     ps.close();
 
                     if (password.equals(psw)) {
-                        
+
                         request.getSession().setAttribute("sessionId", id);
                         request.getSession().setAttribute("admin", admin);
                         view = "../WEB-INF/loged.jsp";
@@ -267,7 +271,6 @@ public class ControllerServlet extends HttpServlet {
                     try {
                         System.out.println("Address: " + address + ", phonenumber: " + phonenumber);
                         PreparedStatement ps = conn.prepareStatement("INSERT INTO PURCHASE VALUES(NULL,?,?,?)");
-                        System.out.println("xddd?");
                         ps.setString(1, (String) (request.getSession().getAttribute("sessionId")));
                         ps.setString(2, address);
                         ps.setString(3, phonenumber);
@@ -296,7 +299,7 @@ public class ControllerServlet extends HttpServlet {
                             ps = conn.prepareStatement("UPDATE PRODUCT SET SOLD=1 WHERE ID=?");
                             ps.setString(1, Integer.toString(cartItems.get(i).getId()));
                             ps.executeUpdate();
-                            
+
                             ps.close();
                         }
                         request.setAttribute("orderId", orderId);
@@ -311,45 +314,70 @@ public class ControllerServlet extends HttpServlet {
 
                 break;
             }
-            
+
             case "/purchases": {
-                
-            try {
-                PreparedStatement ps = conn.prepareStatement("SELECT * FROM PURCHASE pu JOIN PRODUCT_ORDER op ON pu.id=op.purchase JOIN PRODUCT pr ON op.product=pr.id WHERE USER=?");
-                ps.setString(1, (String) request.getSession().getAttribute("sessionId"));
-                
-                ResultSet rs = ps.executeQuery();
-                
-                ArrayList<Product> purchasesArray = new ArrayList<>();
-                while(rs.next()) {
-                    purchasesArray.add(new Product(rs.getInt("id"),rs.getString("name"),rs.getString("description"),rs.getFloat("price"),rs.getString("imagePath"),rs.getInt("sold")));
+
+                try {
+                    PreparedStatement ps = conn.prepareStatement("SELECT * FROM PURCHASE pu JOIN PRODUCT_ORDER op ON pu.id=op.purchase JOIN PRODUCT pr ON op.product=pr.id WHERE USER=?");
+                    ps.setString(1, (String) request.getSession().getAttribute("sessionId"));
+
+                    ResultSet rs = ps.executeQuery();
+
+                    ArrayList<Product> purchasesArray = new ArrayList<>();
+                    while (rs.next()) {
+                        purchasesArray.add(new Product(rs.getInt("id"), rs.getString("name"), rs.getString("description"), rs.getFloat("price"), rs.getString("imagePath"), rs.getInt("sold")));
+                    }
+
+                    request.setAttribute("purchasesArray", purchasesArray);
+                    System.out.println("Cuantas compras: " + request.getSession().getAttribute("sessionId") + " xd " + purchasesArray.size());
+
+                } catch (SQLException ex) {
+                    Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
-                request.setAttribute("purchasesArray", purchasesArray);
-                System.out.println("Cuantas compras: " + request.getSession().getAttribute("sessionId") + " xd " + purchasesArray.size());
-                
-            } catch (SQLException ex) {
-                Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
-            }
-                
+
                 view = "../WEB-INF/purchases.jsp";
                 break;
             }
-            
+
             case "/addProduct": {
-            
                 view = "../WEB-INF/addProduct.jsp";
                 break;
             }
+
+            case "/removeProduct": {
+                
+                
+                try {
+                    ArrayList<Product> productArray = new ArrayList<>();
+                    ps = conn.prepareStatement("SELECT * FROM PRODUCT");
+                    ResultSet rs = ps.executeQuery();
+                    while (rs.next()) {
+                        int id = rs.getInt("id");
+                        String name = rs.getString("name");
+                        String description = rs.getString("description");
+                        float price = rs.getFloat("price");
+                        String imagePath = rs.getString("imagePath");
+                        int sold = rs.getInt("sold");
+                        Product product = new Product(id, name, description, price, imagePath, sold);
+                        productArray.add(product);
+                    }
+                    ps.close();
+                    request.setAttribute("productArray", productArray);
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+                view = "../WEB-INF/index.jsp";
+                break;
+            }
         }
+
+        System.out.println("Action values " + action + ", view values " + view);
 
         if (view != null) {
             RequestDispatcher rd = request.getRequestDispatcher(view);
             if (rd != null) {
                 rd.forward(request, response);
             }
-        } else {
-            System.out.println("Action values " + action + ", view values " + view);
         }
 
     }
