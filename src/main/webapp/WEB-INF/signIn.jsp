@@ -19,7 +19,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/html.html to edit this
                    placeholder="Enter your email" required> 
 
             <label for="password">password</label> 
-            <input type="text" id="password" 
+            <input type="password" id="password" 
                    name="password" 
                    placeholder="Enter your password" required> 
 

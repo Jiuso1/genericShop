@@ -20,7 +20,7 @@
             ArrayList<Product> productArray = (ArrayList<Product>) session.getAttribute("cartItems");
             if (productArray != null) {
                 for (int i = 0; i < productArray.size(); i++) {
-                    Product product = new Product(productArray.get(i).getId(), productArray.get(i).getName(), productArray.get(i).getDescription(), productArray.get(i).getPrice(), productArray.get(i).getImagePath());
+                    Product product = new Product(productArray.get(i).getId(), productArray.get(i).getName(), productArray.get(i).getDescription(), productArray.get(i).getPrice(), productArray.get(i).getImagePath(), productArray.get(i).getSold());
                     out.println("<div style=\"height: 200px; width: 150px; border:1px solid black; margin-bottom:100px\">");
                     out.println("<h3>" + product.getName() + "</h3>");
                     out.println("<p>" + product.getDescription() + "</p>");
@@ -40,7 +40,12 @@
             <button type="submit">Remove cart and go back</button>
         </form>
         <form action="processCart">
-            
+            <input type="text" id="address" 
+                   name="address" 
+                   placeholder="Enter your address" required>
+            <input type="text" id="phonenumber" 
+                   name="phonenumber" 
+                   placeholder="Enter your phonenumber" required> 
             <button type="submit">Process your order</button>
         </form>
     </body>

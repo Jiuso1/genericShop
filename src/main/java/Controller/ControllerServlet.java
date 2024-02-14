@@ -37,7 +37,7 @@ public class ControllerServlet extends HttpServlet {
         String manuPath = "jdbc:sqlite:C:/Users/manu_/Desktop/Clase/4-Cuarto/DAW/genericShop/database/database.db";
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection(jesusPath);
+            conn = DriverManager.getConnection(manuPath);
         } catch (SQLException | ClassNotFoundException ex) {
             Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -252,7 +252,56 @@ public class ControllerServlet extends HttpServlet {
                 break;
             }
             case "/processCart": {
-                view = "../WEB-INF/process.jsp";
+
+                if (request.getSession().getAttribute("sessionId") != null) {
+                    String address = request.getParameter("address");
+                    String phonenumber = request.getParameter("phonenumber");
+                    System.out.println("Hola?");
+
+                    try {
+                        System.out.println("Address: " + address + ", phonenumber: " + phonenumber);
+                        PreparedStatement ps = conn.prepareStatement("INSERT INTO PURCHASE VALUES(NULL,?,?,?)");
+                        System.out.println("xddd?");
+                        ps.setString(1, (String) (request.getSession().getAttribute("sessionId")));
+                        ps.setString(2, address);
+                        ps.setString(3, phonenumber);
+
+                        ps.executeUpdate();
+                        ps.close();
+
+                        int orderId = 0;
+                        ps = conn.prepareStatement("SELECT MAX(ID) FROM PURCHASE WHERE USER=?");
+                        ps.setString(1, (String) request.getSession().getAttribute("sessionId"));
+                        ResultSet rs = ps.executeQuery();
+                        while (rs.next()) {
+                            orderId = rs.getInt(1);
+                        }
+                        ps.close();
+
+                        ArrayList<Product> cartItems = (ArrayList<Product>) request.getSession().getAttribute("cartItems");
+
+                        for (int i = 0; i < cartItems.size(); i++) {
+                            ps = conn.prepareStatement("INSERT INTO PRODUCT_ORDER VALUES(?,?)");
+                            ps.setString(1, Integer.toString(cartItems.get(i).getId()));
+                            ps.setString(2, Integer.toString(orderId));
+                            ps.executeUpdate();
+                            ps.close();
+
+                            ps = conn.prepareStatement("UPDATE PRODUCT SET SOLD=1 WHERE ID=?");
+                            ps.setString(1, Integer.toString(cartItems.get(i).getId()));
+
+                            ps.close();
+                        }
+                        request.setAttribute("orderId", orderId);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    view = "../WEB-INF/process.jsp";
+                } else {
+                    view = "../WEB-INF/signIn.jsp";
+                }
+
                 break;
             }
         }

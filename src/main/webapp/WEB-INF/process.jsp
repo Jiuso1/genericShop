@@ -12,6 +12,9 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>process</h1>
+        <h1>Your purchase has been processed! Use this id for tracking your shipping: <%out.print(request.getAttribute("orderId"));%></h1>
+        <form action="realIndex">
+            <button type="submit">Go to main menu</button>
+        </form>
     </body>
 </html>
