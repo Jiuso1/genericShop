@@ -28,6 +28,7 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.23.1</version>
         </dependency>
+        
     </dependencies>
 
     <build>

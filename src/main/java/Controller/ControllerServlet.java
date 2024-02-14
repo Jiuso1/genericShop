@@ -7,6 +7,7 @@ package Controller;
 import Model.Product;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -15,6 +16,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -37,7 +42,7 @@ public class ControllerServlet extends HttpServlet {
         String manuPath = "jdbc:sqlite:C:/Users/manu_/Desktop/Clase/4-Cuarto/DAW/genericShop/database/database.db";
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection(jesusPath);
+            conn = DriverManager.getConnection(manuPath);
         } catch (SQLException | ClassNotFoundException ex) {
             Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -193,18 +198,57 @@ public class ControllerServlet extends HttpServlet {
             }
 
             case "/sendCart": {
-                // Get JS Data:
+                ArrayList<Integer> idsList = new ArrayList<>();
+                // Get JS Data:   
                 String jsonData = request.getReader().lines().collect(java.util.stream.Collectors.joining());
                 System.out.println("JS received: " + jsonData);
+
+                try (JsonReader jsonReader = Json.createReader(new StringReader(jsonData))) {
+                    // Leer el JSON como objeto
+                    JsonObject jsonObject = jsonReader.readObject();
+
+                    // Obtener el array "cart" del objeto
+                    JsonArray cartArray = jsonObject.getJsonArray("cart");
+
+                    // Crear un ArrayList para almacenar los IDs
+                    // Iterar sobre los elementos del array y agregarlos al ArrayList
+                    for (int i = 0; i < cartArray.size(); i++) {
+                        // Convertir el valor del array a entero y agregarlo al ArrayList
+                        idsList.add(Integer.parseInt(cartArray.getString(i)));
+                    }
+                }
+
+                ArrayList<Product> productArray = new ArrayList<>();
+                try {
+                    for (int i = 0; i < idsList.size(); i++) {
+                        ps = conn.prepareStatement("SELECT * FROM PRODUCT WHERE ID=?");
+                        ps.setString(1, Integer.toString(idsList.get(i)));
+                        ResultSet rs = ps.executeQuery();
+                        while (rs.next()) {
+                            int id = rs.getInt("id");
+                            String name = rs.getString("name");
+                            String description = rs.getString("description");
+                            float price = rs.getFloat("price");
+                            String imagePath = rs.getString("imagePath");
+                            Product product = new Product(id, name, description, price, imagePath);
+                            productArray.add(product);
+                        }
+                        ps.close();
+                    }
+
+                } catch (SQLException ex) {
+                    Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                request.setAttribute("cartItems", productArray);
                 view = "../WEB-INF/cart.jsp";
                 break;
             }
             
-            case "/viewCart":{
+            case "/viewCart": {
                 view = "../WEB-INF/cart.jsp";
                 break;
             }
-
         }
 
         RequestDispatcher rd = request.getRequestDispatcher(view);
