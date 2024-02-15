@@ -10,6 +10,7 @@ for (let i = 0; i < buttons.length; i++) {
     buttons[i].addEventListener('click', event => {
         let id = buttons[i].getAttribute('value');
         if (!cart.includes(id)) {
+            console.log("El id: " + id);
             cart.push(id);
             updateCartCounter();
         }

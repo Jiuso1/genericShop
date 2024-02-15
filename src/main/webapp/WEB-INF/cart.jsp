@@ -25,7 +25,7 @@
                     out.println("<h3>" + product.getName() + "</h3>");
                     out.println("<p>" + product.getDescription() + "</p>");
                     out.println("<p>" + product.getPrice() + " €</p>");
-                    if (product.getImagePath() == null || !product.getImagePath().contains("localhost")) {
+                    if (product.getImagePath() == null) {
                         out.println("<img src=\"http://localhost:8080/genericShop/images/error.jpg\">");
                     } else {
                         out.println("<img src=\"" + product.getImagePath() + "\">");

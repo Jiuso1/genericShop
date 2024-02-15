@@ -12,6 +12,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
+        <link href="../style.css" rel="stylesheet" type="text/css"/>
     </head>
     <body>
         <h1>Index</h1>
@@ -34,7 +35,8 @@
                 for (int i = 0; i < productArray.size(); i++) {
                     Product product = productArray.get(i);
                     if (product.getSold() == 0) {
-                        out.println("<div style=\"height: 200px; width: 150px; border:1px solid black; margin-bottom:100px\">");
+                        out.println("<div id=\"productCardContainer\">");
+                        out.println("<div class=\"productCard\">");
                         out.println("<h3>" + product.getName() + "</h3>");
                         out.println("<p>" + product.getDescription() + "</p>");
                         out.println("<p>" + product.getPrice() + " €</p>");
@@ -48,6 +50,7 @@
                         if (admin != null && admin.equals("1")) {
                             out.println("<button class=\"removeButton\" style=\"background-color: red;\" type=\"submit\" value=\"" + product.getId() + "\">Remove product</button>");
                         }
+                        out.println("</div>");
                         out.println("</div>");
                     }
                 }

@@ -1,1 +1,17 @@
+.productCard {
+    height: auto;
+    width: 15%;
+    background-color: lightblue;
+    border-radius: 20px;
+    text-align: center;
+}
 
+.productCard > img {
+    width: 80%;
+    height: auto;
+    aspect-ratio: 1;
+}
+
+#productCardContainer {
+    
+}
