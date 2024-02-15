@@ -38,7 +38,7 @@
                         out.println("<h3>" + product.getName() + "</h3>");
                         out.println("<p>" + product.getDescription() + "</p>");
                         out.println("<p>" + product.getPrice() + " €</p>");
-                        if (product.getImagePath() == null || !product.getImagePath().contains("localhost")) {
+                        if (product.getImagePath() == null) {
                             out.println("<img src=\"http://localhost:8080/genericShop/images/error.jpg\">");
                         } else {
                             out.println("<img src=\"" + product.getImagePath() + "\">");
@@ -46,7 +46,7 @@
                         out.println("<br>");
                         out.println("<button class=\"addCart\" value=\"" + product.getId() + "\">Add to cart</button>");
                         if (admin != null && admin.equals("1")) {
-                            out.println("<form action=\"removeProduct\"><button style=\"background-color: red;\" type=\"submit\" name=\"" + product.getId() + "\">Remove product</button></form>");
+                            out.println("<button class=\"removeButton\" style=\"background-color: red;\" type=\"submit\" value=\"" + product.getId() + "\">Remove product</button>");
                         }
                         out.println("</div>");
                     }

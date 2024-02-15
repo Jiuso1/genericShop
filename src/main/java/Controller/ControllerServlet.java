@@ -37,7 +37,7 @@ public class ControllerServlet extends HttpServlet {
         String manuPath = "jdbc:sqlite:C:/Users/manu_/Desktop/Clase/4-Cuarto/DAW/genericShop/database/database.db";
         try {
             Class.forName("org.sqlite.JDBC");
-            conn = DriverManager.getConnection(jesusPath);
+            conn = DriverManager.getConnection(manuPath);
         } catch (SQLException | ClassNotFoundException ex) {
             Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -344,10 +344,45 @@ public class ControllerServlet extends HttpServlet {
                 break;
             }
 
-            case "/removeProduct": {
-                
-                
+            case "/uploadProduct": {
+                String name = request.getParameter("name");
+                String description = request.getParameter("description");
+                String price = request.getParameter("price");
+                String link = request.getParameter("link");
+
+                PreparedStatement ps;
                 try {
+                    ps = conn.prepareStatement("INSERT INTO PRODUCT VALUES(NULL,?,?,?,?,0)");
+
+                    ps.setString(1, name);
+                    ps.setString(2, description);
+                    ps.setString(3, price);
+                    ps.setString(4, link);
+
+                    ps.executeUpdate();
+                    ps.close();
+                } catch (SQLException ex) {
+                    Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+            }
+
+            case "/removeProduct": {
+
+                try {
+                    String jsonData = request.getReader().lines().collect(java.util.stream.Collectors.joining());
+                    System.out.println("json: " + jsonData);
+                    ArrayList<Integer> idList = parseJson(jsonData);
+
+                    if (idList.size() != 0) {
+                        ps = conn.prepareStatement("DELETE FROM PRODUCT WHERE ID=?");
+                        ps.setString(1, Integer.toString(idList.get(0)));
+                        ps.executeUpdate();
+                        ps.close();
+                    } else {
+                        System.out.println("svdkfngkv");
+                    }
+
                     ArrayList<Product> productArray = new ArrayList<>();
                     ps = conn.prepareStatement("SELECT * FROM PRODUCT");
                     ResultSet rs = ps.executeQuery();

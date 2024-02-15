@@ -13,7 +13,7 @@
     </head>
     <body>
         <h1>Upload a product</h1>
-        <form action="register"> 
+        <form action="uploadProduct"> 
             <label for="name">name</label> 
             <input type="text" id="name" 
                    name="name" 
@@ -27,11 +27,15 @@
             <label for="price">price</label> 
             <input type="text" id="price" 
                    name="price" 
-                   placeholder="Product price" required> 
-
-            <input type="file" id="fileup" name="file" accept="image/*" >
+                   placeholder="Product price" required>
+            
+            <label for="link">price</label> 
+            <input type="text" id="link" 
+                   name="link" 
+                   placeholder="Upload wherever you want :D (imgur, flicker, instagram...)" required> 
 
             <button type="submit">Upload</button>  
+            
         </form>
     </body>
 </html>
